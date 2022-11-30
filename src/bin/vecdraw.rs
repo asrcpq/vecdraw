@@ -59,7 +59,7 @@ fn main() {
 					}
 					if button_on {
 						if mode == 2 {
-							// tx.send(Msg::Lock(wpos)).unwrap();
+							vecdraw.move_select(wpos);
 						} else if mode == 1 {
 							vecdraw.select_update(wpos);
 						} else if mode == 0 {
@@ -80,7 +80,7 @@ fn main() {
 							button_on = true;
 						} else {
 							if mode == 2 {
-								// tx.send(Msg::Unlock).unwrap();
+								vecdraw.move_end();
 							} else if mode == 1 {
 								vecdraw.finish_select();
 							} else {

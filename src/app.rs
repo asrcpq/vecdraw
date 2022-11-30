@@ -10,6 +10,7 @@ pub struct Vecdraw {
 	select_range: Vec<V2>,
 	snap_highlight: Option<Vid>,
 	selected: Vec<Vid>,
+	move_pps: Option<V2>,
 }
 
 enum Point {
@@ -161,6 +162,20 @@ impl Vecdraw {
 		} else {
 			self.drawing[1] = p;
 		}
+	}
+
+	pub fn move_end(&mut self) {
+		self.move_pps = None;
+	}
+
+	pub fn move_select(&mut self, o: V2) {
+		if let Some(oo) = self.move_pps {
+			for vsel in self.selected.iter() {
+				let v = self.rawmo.vs.get_mut(vsel).unwrap();
+				v.pos += o - oo;
+			}
+		}
+		self.move_pps = Some(o);
 	}
 
 	pub fn render(&self) -> Ttrimo {
