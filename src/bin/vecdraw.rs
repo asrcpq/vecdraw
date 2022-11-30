@@ -94,6 +94,7 @@ fn main() {
 					if let Some(key) = Skey::from_wki(wki) {
 						if key.down { match key.ty {
 							Sktype::Ascii(b'a') => {
+								vecdraw.unselect();
 								mode = 0;
 							}
 							Sktype::Ascii(b'r') => {
@@ -101,6 +102,9 @@ fn main() {
 							},
 							Sktype::Ascii(b't') => {
 								mode = 2;
+							}
+							Sktype::Direction(5) => {
+								vecdraw.delete_select();
 							}
 							_ => {},
 						}}

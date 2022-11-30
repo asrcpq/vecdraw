@@ -9,6 +9,7 @@ pub struct Vecdraw {
 	drawing: Vec<Point>,
 	select_range: Vec<V2>,
 	snap_highlight: Option<Vid>,
+	selected: Vec<Vid>,
 }
 
 enum Point {
@@ -79,12 +80,32 @@ impl Vecdraw {
 		}
 		self.drawing.clear();
 	}
-	
+
+	pub fn delete_select(&mut self) {
+	}
+
 	pub fn finish_select(&mut self) {
+		self.selected.clear();
 		if self.select_range.len() == 2 {
-			// do select
+			let s1 = self.select_range[0];
+			let s2 = self.select_range[1];
+			let minx = s1[0].min(s2[0]);
+			let maxx = s1[0].max(s2[0]);
+			let miny = s1[1].min(s2[1]);
+			let maxy = s1[1].max(s2[1]);
+			for (k, v) in self.rawmo.vs.iter() {
+				if v.pos[0] > minx && v.pos[0] < maxx &&
+					v.pos[1] > miny && v.pos[1] < maxy
+				{
+					self.selected.push(*k);
+				}
+			}
 		}
 		self.select_range.clear();
+	}
+
+	pub fn unselect(&mut self) {
+		self.selected.clear();
 	}
 
 	pub fn select_update(&mut self, wpos: V2) {
@@ -152,6 +173,11 @@ impl Vecdraw {
 		let pen = Pen {width: 0.01f32, color: [1f32, 1f32, 0f32, 0.5f32], z: 0.6f32};
 		if let Some(x) = self.snap_highlight {
 			pen.draw_dot(&mut model, self.rawmo.vs.get(&x).unwrap().pos);
+		}
+		let pen = Pen {width: 0.01f32, color: [0f32, 1f32, 0f32, 0.3f32], z: 0.6f32};
+		for vsel in self.selected.iter() {
+			let p = self.rawmo.vs.get(vsel).unwrap().pos;
+			pen.draw_dot(&mut model, p);
 		}
 		model
 	}
