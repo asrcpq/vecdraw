@@ -12,15 +12,9 @@ use ttri::camcon::Camcon;
 use ttri::renderer::Renderer;
 use ttri_model::cmodel::{Model, Face};
 use ttri_model::draw::Pen;
+use psva4_model::rawmodel::Rawmodel;
 
 type V2 = rust_stddep::nalgebra::Vector2<f32>;
-
-#[derive(Default)]
-struct Vmodel {
-	neigh: HashMap<u32, Vec<u32>>,
-	vs: HashMap<u32, V2>,
-
-}
 
 fn main() {
 	let el = EventLoopBuilder::<()>::with_user_event().build();
@@ -32,7 +26,7 @@ fn main() {
 	let mut button_on = false;
 	let mut move_mode = true;
 	let mut select_range = Vec::new();
-	let mut model = Vmodel::default();
+	// let mut model = Rawmodel::default();
 	camcon.fit_inner(V2::new(0.0, 0.0), V2::new(1.0, 1.0));
 	el.run(move |event, _, ctrl| match event {
 		Event::WindowEvent { event: e, .. } => {

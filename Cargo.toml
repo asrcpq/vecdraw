@@ -6,5 +6,6 @@ edition = "2021"
 [dependencies]
 skey = {path = "../skey", features = ["winit"]}
 ttri_model = {path = "../ttri_model"}
+psva4_model = {path = "../psva4_model"}
 ttri = {path = "../ttri"}
 rust_stddep = {path = "../rust_stddep", features = ["nalgebra"]}
