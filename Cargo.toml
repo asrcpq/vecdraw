@@ -1,0 +1,10 @@
+[package]
+name = "vecdraw"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+skey = {path = "../skey", features = ["winit"]}
+ttri_model = {path = "../ttri_model"}
+ttri = {path = "../ttri"}
+rust_stddep = {path = "../rust_stddep", features = ["nalgebra"]}
