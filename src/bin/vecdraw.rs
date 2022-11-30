@@ -6,7 +6,8 @@ use ttri::reexport::winit::{
 };
 
 use skey::{Skey, Sktype};
-use skey::winit::WinitConversion;
+use skey::modtrack::ModifierTracker as Modtrack;
+use skey::winit::{WinitConversion, WinitModifier};
 use ttri::teximg::Teximg;
 use ttri::camcon::Camcon;
 use ttri::renderer::Renderer;
@@ -24,6 +25,7 @@ fn main() {
 	let mut camcon = Camcon::new([640, 480]);
 	let mut button_on = false;
 	let mut drawing: Vec<V2> = Default::default();
+	let mut modtrack = Modtrack::default();
 	// 0: draw mode
 	// 1: select mode
 	// 2: move mode
@@ -72,6 +74,9 @@ fn main() {
 							}
 						}
 					}
+				}
+				WindowEvent::ModifiersChanged(ms) => {
+					modtrack.update_state(ms);
 				}
 				WindowEvent::MouseInput {
 					state,
