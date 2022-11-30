@@ -9,6 +9,9 @@ use crate::V2;
 use skey::{Skey, Sktype};
 use skey::modtrack::ModifierTracker as Modtrack;
 use skey::winit::{WinitConversion, WinitModifier};
+use ttri_model::draw::Pen;
+use ttri_model::cmodel::{Face, Model as Ttrimo};
+use ttri::teximg::Teximg;
 use ttri::camcon::Camcon;
 use ttri::renderer::Renderer;
 
@@ -19,11 +22,20 @@ pub struct Gui {
 	modtrack: Modtrack,
 	mode: u8,
 	vecdraw: Vecdraw,
+	tex_layer: i32,
 }
 
 impl Gui {
 	pub fn new(vecdraw: Vecdraw, el: &EventLoop<()>) -> Self {
-		let rdr = Renderer::new(el);
+		let mut rdr = Renderer::new(el);
+		let args = std::env::args().collect::<Vec<_>>();
+		let tex_layer = if args.len() >= 3 {
+			let teximg = Teximg::load(&args[2], true);
+			rdr.upload_tex(teximg, 0);
+			0
+		} else {
+			-2
+		};
 		let mut camcon = Camcon::new([640, 480]);
 		camcon.fit_inner(V2::new(0.0, 0.0), V2::new(1.0, 1.0));
 		let button_on = false;
@@ -37,6 +49,7 @@ impl Gui {
 			button_on,
 			modtrack,
 			mode: 1,
+			tex_layer,
 			vecdraw,
 		}
 	}
@@ -142,8 +155,45 @@ impl Gui {
 			}
 		}
 		Event::MainEventsCleared => {
+			let mut model = if self.tex_layer < 0 {
+				let mut model = Ttrimo::default();
+				let pen = Pen {width: 0f32, color: [0f32, 0f32, 0f32, 1f32], z: 0.9f32};
+				pen.draw_rect(&mut model, V2::new(0.0, 0.0), V2::new(1.0, 1.0));
+				model
+			} else {
+				let vs = vec![
+					[0.0, 0.0, 0.9, 1.0],
+					[0.0, 1.0, 0.9, 1.0],
+					[1.0, 0.0, 0.9, 1.0],
+					[1.0, 1.0, 0.9, 1.0],
+				];
+				let uvs = vec![
+					[0.0, 0.0],
+					[0.0, 1.0],
+					[1.0, 0.0],
+					[1.0, 1.0],
+				];
+				let faces = vec![
+					Face {
+						vid: [0, 1, 2],
+						uvid: [0, 1, 2],
+						color: [0f32; 4],
+						layer: self.tex_layer,
+					},
+					Face {
+						vid: [3, 1, 2],
+						uvid: [3, 1, 2],
+						color: [0f32; 4],
+						layer: self.tex_layer,
+					},
+				];
+				Ttrimo {vs, uvs, faces}
+			};
+			let pen = Pen {width: 0f32, color: [0.1, 0.1, 0.1, 1f32], z: 0.95f32};
+			pen.draw_rect(&mut model, V2::new(-10.0, -10.0), V2::new(9.0, 9.0));
+			let _m1 = vec![self.rdr.insert_model(&model)];
 			let model = self.vecdraw.render();
-			let _model_handle = vec![self.rdr.insert_model(&model)];
+			let _m2 = vec![self.rdr.insert_model(&model)];
 			self.rdr.render(self.camcon.get_camera());
 			*ctrl = ControlFlow::Wait;
 		}

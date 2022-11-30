@@ -186,11 +186,7 @@ impl Vecdraw {
 
 	pub fn render(&self) -> Ttrimo {
 		let mut model = Ttrimo::default();
-		let pen = Pen {width: 0f32, color: [0.1, 0.1, 0.1, 1f32], z: 0.9f32};
-		pen.draw_rect(&mut model, V2::new(-10.0, -10.0), V2::new(9.0, 9.0));
-		let pen = Pen {width: 0f32, color: [0f32, 0f32, 0f32, 1f32], z: 0.8f32};
-		pen.draw_rect(&mut model, V2::new(0.0, 0.0), V2::new(1.0, 1.0));
-		let pen = Pen {width: 0.001f32, color: [1f32; 4], z: 0.6f32};
+		let pen = Pen {width: 0.001f32, color: [1f32, 0f32, 0f32, 1f32], z: 0.6f32};
 		let pen2 = Pen {width: 0.005f32, color: [1f32, 0.5, 0.0, 0.5], z: 0.55f32};
 		for (k, v) in self.rawmo.neigh.iter() {
 			let v1 = self.rawmo.vs.get(k).unwrap();
