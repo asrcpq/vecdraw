@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::sync::mpsc::channel;
 use ttri::reexport::winit::{
 	event_loop::{ControlFlow, EventLoopBuilder},
@@ -14,18 +15,25 @@ use ttri_model::draw::Pen;
 
 type V2 = rust_stddep::nalgebra::Vector2<f32>;
 
+#[derive(Default)]
+struct Vmodel {
+	neigh: HashMap<u32, Vec<u32>>,
+	vs: HashMap<u32, V2>,
+
+}
+
 fn main() {
 	let el = EventLoopBuilder::<()>::with_user_event().build();
 	let mut rdr = Renderer::new(&el);
 	let elp = el.create_proxy();
 	// let (tx, rx) = channel();
-	let elp2 = elp.clone();
 	let mut model_handle = Vec::new();
 	let mut camcon = Camcon::new([640, 480]);
 	let mut button_on = false;
 	let mut move_mode = true;
 	let mut select_range = Vec::new();
-	camcon.fit_inner(V2::new(5.0, 0.5), V2::new(8.0, 1.0));
+	let mut model = Vmodel::default();
+	camcon.fit_inner(V2::new(0.0, 0.0), V2::new(1.0, 1.0));
 	el.run(move |event, _, ctrl| match event {
 		Event::WindowEvent { event: e, .. } => {
 			camcon.process_event(&e);
@@ -101,14 +109,15 @@ fn main() {
 			}
 		}
 		Event::MainEventsCleared => {
-			let pen = Pen {width: 1f32, color: [1f32; 4], z: 0f32};
 			let mut model = Model::default();
-			pen.draw_line(&mut model, [V2::new(0.0, 0.0), V2::new(100.0, 100.0)]);
+			let pen = Pen {width: 0f32, color: [0.1, 0.1, 0.1, 1f32], z: 0.9f32};
+			pen.draw_rect(&mut model, V2::new(-10.0, -10.0), V2::new(9.0, 9.0));
+			let pen = Pen {width: 0f32, color: [0f32, 0f32, 0f32, 1f32], z: 0.8f32};
+			pen.draw_rect(&mut model, V2::new(0.0, 0.0), V2::new(1.0, 1.0));
 			model_handle = vec![rdr.insert_model(&model)];
 			rdr.render(camcon.get_camera());
 			*ctrl = ControlFlow::Wait;
 		}
-		Event::UserEvent(e) => {},
 		_ => {},
 	})
 }
