@@ -82,6 +82,24 @@ impl Vecdraw {
 	}
 
 	pub fn delete_select(&mut self) {
+		for vsel in self.selected.iter() {
+			self.rawmo.neigh.remove(vsel);
+			self.rawmo.vs.remove(vsel);
+			for (_, v) in self.rawmo.neigh.iter_mut() {
+				if let Some(x) = v.iter().position(|x| x == vsel) {
+					v.remove(x);
+				}
+			}
+			// vecdraw does not care about faces
+			// for f in std::mem::take(&mut self.rawmo.fs)
+			// 	.into_iter()
+			// {
+			// 	if !f.contains(vsel) {
+			// 		self.rawmo.fs.push(f);
+			// 	}
+			// }
+		}
+		self.unselect();
 	}
 
 	pub fn finish_select(&mut self) {
@@ -151,9 +169,11 @@ impl Vecdraw {
 		pen.draw_rect(&mut model, V2::new(-10.0, -10.0), V2::new(9.0, 9.0));
 		let pen = Pen {width: 0f32, color: [0f32, 0f32, 0f32, 1f32], z: 0.8f32};
 		pen.draw_rect(&mut model, V2::new(0.0, 0.0), V2::new(1.0, 1.0));
-		let pen = Pen {width: 0.002f32, color: [1f32; 4], z: 0.6f32};
+		let pen = Pen {width: 0.001f32, color: [1f32; 4], z: 0.6f32};
+		let pen2 = Pen {width: 0.005f32, color: [1f32, 0.5, 0.0, 0.5], z: 0.55f32};
 		for (k, v) in self.rawmo.neigh.iter() {
 			let v1 = self.rawmo.vs.get(k).unwrap();
+			pen2.draw_dot(&mut model, v1.pos);
 			for vv in v.iter() {
 				let v2 = self.rawmo.vs.get(vv).unwrap();
 				pen.draw_line(&mut model, [v1.pos, v2.pos]);
