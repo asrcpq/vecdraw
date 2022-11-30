@@ -61,7 +61,11 @@ fn main() {
 						if mode == 2 {
 							vecdraw.move_select(wpos);
 						} else if mode == 1 {
-							vecdraw.select_update(wpos);
+							if modtrack.ctrl {
+								vecdraw.exact_select();
+							} else {
+								vecdraw.select_update(wpos);
+							}
 						} else if mode == 0 {
 							vecdraw.drawing_update(wpos);
 						}
@@ -83,6 +87,7 @@ fn main() {
 								vecdraw.move_end();
 							} else if mode == 1 {
 								vecdraw.finish_select();
+								mode = 2;
 							} else {
 								vecdraw.finish_draw();
 							}
@@ -103,7 +108,7 @@ fn main() {
 							Sktype::Ascii(b't') => {
 								mode = 2;
 							}
-							Sktype::Direction(5) => {
+							Sktype::Ascii(b'x') => {
 								vecdraw.delete_select();
 							}
 							_ => {},

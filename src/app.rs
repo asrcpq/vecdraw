@@ -168,6 +168,12 @@ impl Vecdraw {
 		self.move_pps = None;
 	}
 
+	pub fn exact_select(&mut self) {
+		if let Some(id) = self.snap_highlight {
+			self.selected = vec![id];
+		}
+	}
+
 	pub fn move_select(&mut self, o: V2) {
 		if let Some(oo) = self.move_pps {
 			for vsel in self.selected.iter() {
