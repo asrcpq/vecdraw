@@ -1,6 +1,7 @@
 use ttri::reexport::winit::{
 	event_loop::{ControlFlow, EventLoop},
 	event::{Event, WindowEvent, ElementState, MouseButton},
+	window::CursorIcon,
 };
 
 use crate::app::Vecdraw;
@@ -40,7 +41,16 @@ impl Gui {
 		}
 	}
 
-	fn modeswitch(&mut self, mode: u8) { self.mode = mode }
+	fn modeswitch(&mut self, mode: u8) {
+		self.mode = mode;
+		let window = self.rdr.get_window();
+		match mode {
+			0 => window.set_cursor_icon(CursorIcon::Crosshair),
+			1 => window.set_cursor_icon(CursorIcon::Default),
+			2 => window.set_cursor_icon(CursorIcon::Grab),
+			_ => {},
+		}
+	}
 
 	pub fn proc_event(&mut self, e: Event<()>, ctrl: &mut ControlFlow) { match e {
 		Event::WindowEvent { event: e, .. } => {
@@ -93,7 +103,6 @@ impl Gui {
 								self.vecdraw.move_end();
 							} else if self.mode == 1 {
 								self.vecdraw.finish_select();
-								self.modeswitch(2);
 							} else if self.mode == 0 {
 								self.vecdraw.finish_draw();
 							}
