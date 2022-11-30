@@ -24,9 +24,13 @@ fn main() {
 	let mut model_handle = Vec::new();
 	let mut camcon = Camcon::new([640, 480]);
 	let mut button_on = false;
-	let mut move_mode = true;
+	// 0: draw mode
+	// 1: select mode
+	// 2: move mode
+	let mut mode = 1;
 	let mut select_range = Vec::new();
-	// let mut model = Rawmodel::default();
+	let args = std::env::args().collect::<Vec<_>>();
+	let mut rawmo = Rawmodel::load(&args[1]).unwrap_or_default();
 	camcon.fit_inner(V2::new(0.0, 0.0), V2::new(1.0, 1.0));
 	el.run(move |event, _, ctrl| match event {
 		Event::WindowEvent { event: e, .. } => {
@@ -43,9 +47,9 @@ fn main() {
 						let pos: [f64; 2] = position.into();
 						let pos = V2::new(pos[0] as f32, pos[1] as f32);
 						let wpos = camcon.s2w(pos);
-						if move_mode {
+						if mode == 2 {
 							// tx.send(Msg::Lock(wpos)).unwrap();
-						} else {
+						} else if mode == 1 {
 							if select_range.len() < 2 {
 								select_range.push(wpos);
 							} else {
@@ -63,13 +67,14 @@ fn main() {
 						if state == ElementState::Pressed {
 							button_on = true;
 						} else {
-							if move_mode {
+							if mode == 2 {
 								// tx.send(Msg::Unlock).unwrap();
 							} else {
 								if select_range.len() == 2 {
 									eprintln!("range {:?}", select_range);
 									// tx.send(Msg::Select(select_range[0], select_range[1])).unwrap();
 								}
+								mode = 2;
 								select_range.clear();
 							}
 							button_on = false;
@@ -79,17 +84,13 @@ fn main() {
 				WindowEvent::KeyboardInput { input: wki, .. } => {
 					if let Some(key) = Skey::from_wki(wki) {
 						if key.down { match key.ty {
+							Sktype::Ascii(b'a') => {
+								mode = 0;
+							}
 							Sktype::Ascii(b'r') => {
-								if move_mode {
-									move_mode = false;
-									eprintln!("move mode: {}", move_mode);
+								if mode != 1 {
+									mode = 1;
 								}
-							},
-							_ => {},
-						}} else { match key.ty {
-							Sktype::Ascii(b'r') => {
-								move_mode = true;
-								eprintln!("move mode: {}", move_mode);
 							},
 							_ => {},
 						}}
@@ -108,6 +109,8 @@ fn main() {
 			pen.draw_rect(&mut model, V2::new(-10.0, -10.0), V2::new(9.0, 9.0));
 			let pen = Pen {width: 0f32, color: [0f32, 0f32, 0f32, 1f32], z: 0.8f32};
 			pen.draw_rect(&mut model, V2::new(0.0, 0.0), V2::new(1.0, 1.0));
+			for v in rawmo.vs.values() {
+			}
 			model_handle = vec![rdr.insert_model(&model)];
 			rdr.render(camcon.get_camera());
 			*ctrl = ControlFlow::Wait;
