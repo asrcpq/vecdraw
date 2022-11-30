@@ -79,6 +79,7 @@ impl Gui {
 						} else if self.mode == 1 {
 							if self.modtrack.ctrl {
 								self.vecdraw.exact_select();
+								self.button_on = false;
 							} else {
 								self.vecdraw.select_update(wpos);
 							}
@@ -99,12 +100,15 @@ impl Gui {
 						if state == ElementState::Pressed {
 							self.button_on = true;
 						} else {
-							if self.mode == 2 {
-								self.vecdraw.move_end();
-							} else if self.mode == 1 {
-								self.vecdraw.finish_select();
-							} else if self.mode == 0 {
-								self.vecdraw.finish_draw();
+							// button_on could be manually changed by cancel operation
+							if self.button_on {
+								if self.mode == 2 {
+									self.vecdraw.move_end();
+								} else if self.mode == 1 {
+									self.vecdraw.finish_select();
+								} else if self.mode == 0 {
+									self.vecdraw.finish_draw();
+								}
 							}
 							self.button_on = false;
 						}
