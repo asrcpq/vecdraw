@@ -83,6 +83,9 @@ impl Vecdraw {
 	}
 
 	pub fn delete_select(&mut self) {
+		// dirty
+		self.rawmo.fs.clear();
+		self.rawmo.border.clear();
 		for vsel in self.selected.iter() {
 			self.rawmo.neigh.remove(vsel);
 			self.rawmo.vs.remove(vsel);
@@ -120,6 +123,7 @@ impl Vecdraw {
 				}
 			}
 		}
+		eprintln!("select {:?}", self.selected);
 		self.select_range.clear();
 	}
 
@@ -184,6 +188,10 @@ impl Vecdraw {
 		self.move_pps = Some(o);
 	}
 
+	pub fn build(&mut self) {
+		self.rawmo.build_topo2();
+	}
+
 	pub fn render(&self) -> Ttrimo {
 		let mut model = Ttrimo::default();
 		for ids in self.rawmo.fs.iter() {
@@ -194,18 +202,25 @@ impl Vecdraw {
 			model.vs.push(v2p4(vspos[0], 0.59));
 			model.vs.push(v2p4(vspos[1], 0.59));
 			model.vs.push(v2p4(vspos[2], 0.59));
-			let color = [0f32, 1.0, 0.5, 0.3];
+			let color = [0f32, 1.0, 0.5, 0.1];
 			model.faces.push(Face::solid([vlen, vlen + 1, vlen + 2], color));
 		}
 
-		let pen = Pen {width: 0.001f32, color: [1f32, 0f32, 0f32, 1f32], z: 0.57f32};
+		let peni = Pen {width: 0.001f32, color: [1f32, 0f32, 0f32, 1f32], z: 0.57f32};
+		let penb = Pen {width: 0.001f32, color: [0f32, 1f32, 0f32, 1f32], z: 0.57f32};
 		let pen2 = Pen {width: 0.005f32, color: [1f32, 0.5, 0.0, 0.5], z: 0.55f32};
 		for (k, v) in self.rawmo.neigh.iter() {
 			let v1 = self.rawmo.vs.get(k).unwrap();
 			pen2.draw_dot(&mut model, v1.pos);
 			for vv in v.iter() {
 				let v2 = self.rawmo.vs.get(vv).unwrap();
-				pen.draw_line(&mut model, [v1.pos, v2.pos]);
+				if self.rawmo.border.contains(k) &&
+					self.rawmo.border.contains(vv)
+				{
+					penb.draw_line(&mut model, [v1.pos, v2.pos]);
+				} else {
+					peni.draw_line(&mut model, [v1.pos, v2.pos]);
+				}
 			}
 		}
 		let pen = Pen {width: 0.003f32, color: [0f32, 1f32, 1f32, 1f32], z: 0.5f32};

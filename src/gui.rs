@@ -26,7 +26,7 @@ pub struct Gui {
 }
 
 impl Gui {
-	pub fn new(vecdraw: Vecdraw, el: &EventLoop<()>) -> Self {
+	pub fn new(vecdraw: Vecdraw, el: &EventLoop<String>) -> Self {
 		let mut rdr = Renderer::new(el);
 		let args = std::env::args().collect::<Vec<_>>();
 		let tex_layer = if args.len() >= 3 {
@@ -65,7 +65,7 @@ impl Gui {
 		}
 	}
 
-	pub fn proc_event(&mut self, e: Event<()>, ctrl: &mut ControlFlow) { match e {
+	pub fn proc_event(&mut self, e: Event<String>, ctrl: &mut ControlFlow) { match e {
 		Event::WindowEvent { event: e, .. } => {
 			self.camcon.process_event(&e);
 			match e {
@@ -196,6 +196,11 @@ impl Gui {
 			let _m2 = vec![self.rdr.insert_model(&model)];
 			self.rdr.render(self.camcon.get_camera());
 			*ctrl = ControlFlow::Wait;
+		}
+		Event::UserEvent(cmd) => {
+			if cmd == "build" {
+				self.vecdraw.build();
+			}
 		}
 		_ => {},
 	}}
