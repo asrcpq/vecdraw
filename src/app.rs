@@ -1,3 +1,5 @@
+use std::collections::HashSet;
+
 use ttri_model::cmodel::{Face, Model as Ttrimo};
 use ttri_model::draw::{Pen, v2p4};
 use psva4_model::rawmodel::{Rawmodel, RawVertex, Vid};
@@ -86,7 +88,6 @@ impl Vecdraw {
 		// dirty
 		self.rawmo.fs.clear();
 		self.rawmo.border.clear();
-
 		for vsel in self.selected.iter() {
 			self.rawmo.neigh.remove(vsel);
 			self.rawmo.vs.remove(vsel);
@@ -199,20 +200,23 @@ impl Vecdraw {
 			model.faces.push(Face::solid([vlen, vlen + 1, vlen + 2], color));
 		}
 
-		let peni = Pen {width: 0.001f32, color: [1f32, 0f32, 0f32, 1f32], z: 0.57f32};
-		let penb = Pen {width: 0.001f32, color: [0f32, 1f32, 0f32, 1f32], z: 0.57f32};
-		let pen2 = Pen {width: 0.005f32, color: [1f32, 0.5, 0.0, 0.5], z: 0.55f32};
+		let peni = Pen {width: 0.005f32, color: [1f32, 0.5, 0.0, 0.5], z: 0.55f32};
+		let penb = Pen {width: 0.005f32, color: [0f32, 1f32, 0f32, 1f32], z: 0.55f32};
+		let pen2 = Pen {width: 0.001f32, color: [1f32, 0f32, 0f32, 1f32], z: 0.57f32};
+		let mut drawed = HashSet::new();
 		for (k, v) in self.rawmo.neigh.iter() {
 			let v1 = self.rawmo.vs.get(k).unwrap();
-			pen2.draw_dot(&mut model, v1.pos);
+			if self.rawmo.border.contains(k) {
+				penb.draw_dot(&mut model, v1.pos);
+			} else {
+				peni.draw_dot(&mut model, v1.pos);
+			}
 			for vv in v.iter() {
 				let v2 = self.rawmo.vs.get(vv).unwrap();
-				if self.rawmo.border.contains(k) &&
-					self.rawmo.border.contains(vv)
-				{
-					penb.draw_line(&mut model, [v1.pos, v2.pos]);
-				} else {
-					peni.draw_line(&mut model, [v1.pos, v2.pos]);
+				let mut ids = [*k, *vv];
+				ids.sort_unstable();
+				if drawed.insert(ids) {
+					pen2.draw_line(&mut model, [v1.pos, v2.pos]);
 				}
 			}
 		}
