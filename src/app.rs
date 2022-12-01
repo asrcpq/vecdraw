@@ -86,6 +86,7 @@ impl Vecdraw {
 		// dirty
 		self.rawmo.fs.clear();
 		self.rawmo.border.clear();
+
 		for vsel in self.selected.iter() {
 			self.rawmo.neigh.remove(vsel);
 			self.rawmo.vs.remove(vsel);
@@ -94,14 +95,6 @@ impl Vecdraw {
 					v.remove(x);
 				}
 			}
-			// vecdraw does not care about faces
-			// for f in std::mem::take(&mut self.rawmo.fs)
-			// 	.into_iter()
-			// {
-			// 	if !f.contains(vsel) {
-			// 		self.rawmo.fs.push(f);
-			// 	}
-			// }
 		}
 		self.unselect();
 	}
