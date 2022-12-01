@@ -216,6 +216,11 @@ impl Gui {
 				"dcs" => {
 					self.vecdraw.select_apply_dcv();
 				}
+				"name" => {
+					if let Some(f) = split.get(1) {
+						self.vecdraw.name_select(f.to_string());
+					}
+				}
 				_ => {},
 			}
 		}

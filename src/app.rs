@@ -36,6 +36,17 @@ impl Vecdraw {
 		}
 	}
 
+	pub fn name_select(&mut self, name: String) {
+		if self.selected.len() != 1 {
+			eprintln!("ERROR: select != 1");
+			return
+		}
+		let vid = self.selected.iter().next().unwrap();
+		self.rawmo.name.remove_by_right(vid);
+		eprintln!("named {} to {}", vid, name);
+		self.rawmo.name.insert(name, *vid);
+	}
+
 	pub fn save(&mut self, path: &str) {
 		self.rawmo.pos2tex();
 		self.rawmo.fix();
