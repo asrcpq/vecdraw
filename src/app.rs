@@ -1,5 +1,5 @@
-use ttri_model::cmodel::Model as Ttrimo;
-use ttri_model::draw::Pen;
+use ttri_model::cmodel::{Face, Model as Ttrimo};
+use ttri_model::draw::{Pen, v2p4};
 use psva4_model::rawmodel::{Rawmodel, RawVertex, Vid};
 use crate::V2;
 
@@ -186,7 +186,19 @@ impl Vecdraw {
 
 	pub fn render(&self) -> Ttrimo {
 		let mut model = Ttrimo::default();
-		let pen = Pen {width: 0.001f32, color: [1f32, 0f32, 0f32, 1f32], z: 0.6f32};
+		for ids in self.rawmo.fs.iter() {
+			let vlen = model.vs.len();
+			let vspos: [V2; 3] = core::array::from_fn(
+				|idx| self.rawmo.vs.get(&ids[idx]).unwrap().pos
+			);
+			model.vs.push(v2p4(vspos[0], 0.59));
+			model.vs.push(v2p4(vspos[1], 0.59));
+			model.vs.push(v2p4(vspos[2], 0.59));
+			let color = [0f32, 1.0, 0.5, 0.3];
+			model.faces.push(Face::solid([vlen, vlen + 1, vlen + 2], color));
+		}
+
+		let pen = Pen {width: 0.001f32, color: [1f32, 0f32, 0f32, 1f32], z: 0.57f32};
 		let pen2 = Pen {width: 0.005f32, color: [1f32, 0.5, 0.0, 0.5], z: 0.55f32};
 		for (k, v) in self.rawmo.neigh.iter() {
 			let v1 = self.rawmo.vs.get(k).unwrap();
