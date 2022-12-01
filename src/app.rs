@@ -13,6 +13,7 @@ pub struct Vecdraw {
 	snap_highlight: Option<Vid>,
 	selected: Vec<Vid>,
 	move_pps: Option<V2>,
+	dc: f32,
 }
 
 enum Point {
@@ -37,6 +38,11 @@ impl Vecdraw {
 
 	pub fn save(&self, path: &str) {
 		self.rawmo.save(path).unwrap();
+	}
+
+	pub fn set_dc(&mut self, dc: f32) {
+		eprintln!("set dc to {}", dc);
+		self.dc = dc;
 	}
 
 	pub fn finish_draw(&mut self) {
@@ -202,7 +208,7 @@ impl Vecdraw {
 
 		let peni = Pen {width: 0.005f32, color: [1f32, 0.5, 0.0, 0.5], z: 0.55f32};
 		let penb = Pen {width: 0.005f32, color: [0f32, 1f32, 0f32, 1f32], z: 0.55f32};
-		let pen2 = Pen {width: 0.001f32, color: [1f32, 0f32, 0f32, 1f32], z: 0.57f32};
+		let mut pen2 = Pen {width: 0.001f32, color: [1f32, 0f32, 0f32, 1f32], z: 0.57f32};
 		let mut drawed = HashSet::new();
 		for (k, v) in self.rawmo.neigh.iter() {
 			let v1 = self.rawmo.vs.get(k).unwrap();
@@ -216,6 +222,16 @@ impl Vecdraw {
 				let mut ids = [*k, *vv];
 				ids.sort_unstable();
 				if drawed.insert(ids) {
+					pen2.color = if let Some(dc) = self.rawmo.dcs.get(&ids) {
+						let lg = dc.log10();
+						if lg.is_normal() {
+							[1f32, lg / 10f32, 0f32, 1f32]
+						} else {
+							[1f32, 0f32, 1f32, 1f32]
+						}
+					} else {
+						[1f32, 0f32, 1f32, 1f32]
+					};
 					pen2.draw_line(&mut model, [v1.pos, v2.pos]);
 				}
 			}

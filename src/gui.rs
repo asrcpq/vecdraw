@@ -26,7 +26,8 @@ pub struct Gui {
 }
 
 impl Gui {
-	pub fn new(vecdraw: Vecdraw, el: &EventLoop<String>) -> Self {
+	pub fn new(mut vecdraw: Vecdraw, el: &EventLoop<String>) -> Self {
+		vecdraw.set_dc(1e-6);
 		let mut rdr = Renderer::new(el);
 		let args = std::env::args().collect::<Vec<_>>();
 		let tex_layer = if args.len() >= 3 {
@@ -198,8 +199,21 @@ impl Gui {
 			*ctrl = ControlFlow::Wait;
 		}
 		Event::UserEvent(cmd) => {
-			if cmd == "build" {
-				self.vecdraw.build();
+			let split: Vec<_> = cmd.split_whitespace().collect();
+			if split.len() == 0 { return }
+			match split[0] {
+				"build" => {
+					self.vecdraw.build();
+				},
+				"dc" => {
+					if let Some(f) = split.get(1)
+						.map(|x| x.parse::<f32>().ok())
+						.flatten()
+					{
+						self.vecdraw.set_dc(f);
+					}
+				},
+				_ => {},
 			}
 		}
 		_ => {},

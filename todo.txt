@@ -1,0 +1,5 @@
+# todo
+
+checker
+
+also test not good parts: angle, dist, etc.
