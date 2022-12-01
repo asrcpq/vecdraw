@@ -37,6 +37,7 @@ impl Vecdraw {
 	}
 
 	pub fn save(&mut self, path: &str) {
+		self.rawmo.pos2tex();
 		self.rawmo.fix();
 		self.rawmo.save(path).unwrap();
 	}
@@ -202,6 +203,7 @@ impl Vecdraw {
 	}
 
 	pub fn build(&mut self) {
+		self.rawmo.fix();
 		self.rawmo.build_topo2();
 	}
 
