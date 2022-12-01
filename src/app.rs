@@ -36,7 +36,8 @@ impl Vecdraw {
 		}
 	}
 
-	pub fn save(&self, path: &str) {
+	pub fn save(&mut self, path: &str) {
+		self.rawmo.fix();
 		self.rawmo.save(path).unwrap();
 	}
 
