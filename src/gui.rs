@@ -27,7 +27,7 @@ pub struct Gui {
 
 impl Gui {
 	pub fn new(mut vecdraw: Vecdraw, el: &EventLoop<String>) -> Self {
-		vecdraw.set_dc(1e-6);
+		vecdraw.set_dcv(1e-6);
 		let mut rdr = Renderer::new(el);
 		let args = std::env::args().collect::<Vec<_>>();
 		let tex_layer = if args.len() >= 3 {
@@ -205,14 +205,17 @@ impl Gui {
 				"build" => {
 					self.vecdraw.build();
 				},
-				"dc" => {
+				"dcv" => {
 					if let Some(f) = split.get(1)
 						.map(|x| x.parse::<f32>().ok())
 						.flatten()
 					{
-						self.vecdraw.set_dc(f);
+						self.vecdraw.set_dcv(f);
 					}
 				},
+				"dcs" => {
+					self.vecdraw.select_apply_dcv();
+				}
 				_ => {},
 			}
 		}

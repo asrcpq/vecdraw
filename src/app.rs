@@ -11,7 +11,7 @@ pub struct Vecdraw {
 	drawing: Vec<Point>,
 	select_range: Vec<V2>,
 	snap_highlight: Option<Vid>,
-	selected: Vec<Vid>,
+	selected: HashSet<Vid>,
 	move_pps: Option<V2>,
 	dc: f32,
 }
@@ -40,9 +40,20 @@ impl Vecdraw {
 		self.rawmo.save(path).unwrap();
 	}
 
-	pub fn set_dc(&mut self, dc: f32) {
+	pub fn set_dcv(&mut self, dc: f32) {
 		eprintln!("set dc to {}", dc);
 		self.dc = dc;
+	}
+
+	pub fn select_apply_dcv(&mut self) {
+		for ([id1, id2], v) in self.rawmo.dcs.iter_mut() {
+			if self.selected.contains(id1) && self.selected.contains(id2) {
+				eprint!("[{}, {}]", id1, id2);
+				*v = self.dc;
+			}
+		}
+		eprintln!();
+		eprintln!("dc set to {}", self.dc);
 	}
 
 	pub fn finish_draw(&mut self) {
@@ -119,7 +130,7 @@ impl Vecdraw {
 				if v.pos[0] > minx && v.pos[0] < maxx &&
 					v.pos[1] > miny && v.pos[1] < maxy
 				{
-					self.selected.push(*k);
+					self.selected.insert(*k);
 				}
 			}
 		}
@@ -174,7 +185,8 @@ impl Vecdraw {
 
 	pub fn exact_select(&mut self) {
 		if let Some(id) = self.snap_highlight {
-			self.selected = vec![id];
+			self.selected.clear();
+			self.selected.insert(id);
 		}
 	}
 
@@ -199,16 +211,16 @@ impl Vecdraw {
 			let vspos: [V2; 3] = core::array::from_fn(
 				|idx| self.rawmo.vs.get(&ids[idx]).unwrap().pos
 			);
-			model.vs.push(v2p4(vspos[0], 0.59));
-			model.vs.push(v2p4(vspos[1], 0.59));
-			model.vs.push(v2p4(vspos[2], 0.59));
+			model.vs.push(v2p4(vspos[0], 0.79));
+			model.vs.push(v2p4(vspos[1], 0.79));
+			model.vs.push(v2p4(vspos[2], 0.79));
 			let color = [0f32, 1.0, 0.5, 0.1];
 			model.faces.push(Face::solid([vlen, vlen + 1, vlen + 2], color));
 		}
 
-		let peni = Pen {width: 0.005f32, color: [1f32, 0.5, 0.0, 0.5], z: 0.55f32};
-		let penb = Pen {width: 0.005f32, color: [0f32, 1f32, 0f32, 1f32], z: 0.55f32};
-		let mut pen2 = Pen {width: 0.001f32, color: [1f32, 0f32, 0f32, 1f32], z: 0.57f32};
+		let peni = Pen {width: 0.005f32, color: [1f32, 0.5, 0.0, 0.5], z: 0.75f32};
+		let penb = Pen {width: 0.005f32, color: [0f32, 1f32, 0f32, 1f32], z: 0.75f32};
+		let mut pen2 = Pen {width: 0.001f32, color: [1f32, 0f32, 0f32, 1f32], z: 0.77f32};
 		let mut drawed = HashSet::new();
 		for (k, v) in self.rawmo.neigh.iter() {
 			let v1 = self.rawmo.vs.get(k).unwrap();
@@ -224,8 +236,8 @@ impl Vecdraw {
 				if drawed.insert(ids) {
 					pen2.color = if let Some(dc) = self.rawmo.dcs.get(&ids) {
 						let lg = dc.log10();
-						if lg.is_normal() {
-							[1f32, lg / 10f32, 0f32, 1f32]
+						if lg < 0f32 {
+							[1f32, -lg / 10f32, 0f32, 1f32]
 						} else {
 							[1f32, 0f32, 1f32, 1f32]
 						}
@@ -243,7 +255,7 @@ impl Vecdraw {
 				self.point_pos(&self.drawing[1]),
 			]);
 		}
-		let pen = Pen {width: 0.0f32, color: [0.3f32; 4], z: 0.6f32};
+		let pen = Pen {width: 0.0f32, color: [0.3f32; 4], z: 0.78f32};
 		if self.select_range.len() == 2 {
 			pen.draw_rect(&mut model, self.select_range[0], self.select_range[1]);
 		}
