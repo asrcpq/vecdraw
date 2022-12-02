@@ -3,6 +3,7 @@ use std::collections::HashSet;
 use ttri_model::cmodel::{Face, Model as Ttrimo};
 use ttri_model::draw::{Pen, v2p4};
 use psva4_model::rawmodel::{Rawmodel, RawVertex, Vid};
+use psva4_model::asc::{Asc, AscType};
 use crate::{M2, V2};
 
 #[derive(Default)]
@@ -141,6 +142,32 @@ impl Vecdraw {
 			}
 		}
 		self.unselect();
+	}
+
+	pub fn asc(&mut self, cmd: &str) -> Option<()> {
+		match cmd {
+			"new" => {
+				self.rawmo.asc.push(Asc {
+					deps: Vec::new(),
+					ps: Vec::new(),
+					ty: AscType::Dist(1e-9),
+				});
+			}
+			"rm" => {
+				self.rawmo.asc.pop();
+			}
+			"deps" => {
+				let mut last = self.rawmo.asc.last_mut()?;
+				last.deps = self.selected.iter().cloned().collect();
+			}
+			"ps" => {
+				let mut last = self.rawmo.asc.last_mut()?;
+				last.ps = self.selected.iter().cloned().collect();
+			}
+			_ => {}
+		}
+		eprintln!("{:?}", self.rawmo.asc.last());
+		Some(())
 	}
 
 	pub fn finish_select(&mut self) {

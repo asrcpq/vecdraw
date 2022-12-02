@@ -234,6 +234,12 @@ impl Gui {
 				"selmode" => {
 					self.vecdraw.toggle_selmode();
 				}
+				"asc" => {
+					if split.len() == 1 {
+						return
+					}
+					self.vecdraw.asc(split[1]);
+				}
 				_ => {},
 			}
 		}
