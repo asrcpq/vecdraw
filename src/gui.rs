@@ -5,7 +5,7 @@ use ttri::reexport::winit::{
 };
 
 use crate::app::Vecdraw;
-use crate::V2;
+use crate::{M2, V2};
 use skey::{Skey, Sktype};
 use skey::modtrack::ModifierTracker as Modtrack;
 use skey::winit::{WinitConversion, WinitModifier};
@@ -220,6 +220,19 @@ impl Gui {
 					if let Some(f) = split.get(1) {
 						self.vecdraw.name_select(f.to_string());
 					}
+				}
+				// transform
+				"t" => {
+					if split.len() >= 5 {
+						let m: Vec<_> = (1..5).map(|idx|
+							split[idx].parse::<f32>().unwrap()
+						).collect();
+						let m = M2::new(m[0], m[1], m[2], m[3]);
+						self.vecdraw.transform(m);
+					}
+				}
+				"selmode" => {
+					self.vecdraw.toggle_selmode();
 				}
 				_ => {},
 			}

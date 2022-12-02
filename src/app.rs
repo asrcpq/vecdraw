@@ -3,7 +3,7 @@ use std::collections::HashSet;
 use ttri_model::cmodel::{Face, Model as Ttrimo};
 use ttri_model::draw::{Pen, v2p4};
 use psva4_model::rawmodel::{Rawmodel, RawVertex, Vid};
-use crate::V2;
+use crate::{M2, V2};
 
 #[derive(Default)]
 pub struct Vecdraw {
@@ -12,6 +12,7 @@ pub struct Vecdraw {
 	select_range: Vec<V2>,
 	snap_highlight: Option<Vid>,
 	selected: HashSet<Vid>,
+	selmode: bool,
 	move_pps: Option<V2>,
 	dc: f32,
 }
@@ -36,6 +37,11 @@ impl Vecdraw {
 		}
 	}
 
+	pub fn toggle_selmode(&mut self) {
+		self.selmode ^= true;
+		eprintln!("replace mode: {}", self.selmode);
+	}
+
 	pub fn name_select(&mut self, name: String) {
 		if self.selected.len() != 1 {
 			eprintln!("ERROR: select != 1");
@@ -45,6 +51,13 @@ impl Vecdraw {
 		self.rawmo.name.remove_by_right(vid);
 		eprintln!("named {} to {}", vid, name);
 		self.rawmo.name.insert(name, *vid);
+	}
+
+	pub fn transform(&mut self, m: M2) {
+		for vid in self.selected.iter() {
+			let v = self.rawmo.vs.get_mut(vid).unwrap();
+			v.pos = m * v.pos;
+		}
 	}
 
 	pub fn save(&mut self, path: &str) {
@@ -131,7 +144,9 @@ impl Vecdraw {
 	}
 
 	pub fn finish_select(&mut self) {
-		self.selected.clear();
+		if !self.selmode {
+			self.selected.clear();
+		}
 		if self.select_range.len() == 2 {
 			let s1 = self.select_range[0];
 			let s2 = self.select_range[1];
