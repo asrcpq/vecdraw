@@ -110,12 +110,14 @@ impl Vecdraw {
 					pos: p0,
 					tex: p0,
 					mass: 1f32,
+					break_thresh: 0.1f32,
 				});
 				let p1 = self.point_pos(&self.drawing[1]);
 				self.rawmo.vs.insert(id2, RawVertex {
 					pos: p1,
 					tex: p1,
 					mass: 1f32,
+					break_thresh: 0.1f32,
 				});
 				let e1 = self.rawmo.neigh.entry(id1).or_insert_with(Default::default);
 				e1.push(id2);
