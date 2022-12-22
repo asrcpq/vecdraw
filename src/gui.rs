@@ -12,7 +12,7 @@ use skey::winit::{WinitConversion, WinitModifier};
 use ttri_model::draw::Pen;
 use ttri_model::cmodel::{Face, Model as Ttrimo};
 use ttri::teximg::Teximg;
-use ttri::camcon::Camcon;
+use ttri::cam::camcon2::Camcon;
 use ttri::renderer::Renderer;
 
 pub struct Gui {
