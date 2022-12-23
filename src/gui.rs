@@ -195,7 +195,7 @@ impl Gui {
 			let _m1 = vec![self.rdr.insert_model(&model)];
 			let model = self.vecdraw.render();
 			let _m2 = vec![self.rdr.insert_model(&model)];
-			self.rdr.render(self.camcon.get_camera());
+			self.rdr.render_o(self.camcon.get_camera());
 			*ctrl = ControlFlow::Wait;
 		}
 		Event::UserEvent(cmd) => {
